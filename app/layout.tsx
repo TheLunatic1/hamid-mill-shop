@@ -19,20 +19,20 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Hamid Oil Flour and Dal Mill",
     description: "Premium quality oil, flour, and dal products",
-    url: "https://hamid-mill-shop.vercel.app", // we'll update this after deploy
+    url: "https://hamid-mill-shop.vercel.app/",
     siteName: "Hamid Oil Flour and Dal Mill",
     images: [
       {
-        url: "https://hamid-mill-shop.vercel.app/logo.JPG",           // https://your-site.vercel.app/logo.JPG
+        url: "https://i.imgur.com/RRI2tEI.png",
         width: 1200,
-        height: 630,
-        alt: "Hamid Oil Flour and Dal Mill Logo",
+        height: 675,   // fits the oval badge shape
+        alt: "Hamid Oil Flour and Dal Mill Logo - HOFDM",
       },
       {
-        url: "https://hamid-mill-shop.vercel.app/logo.PNG",
+        url: "https://i.imgur.com/RRI2tEI.png",
         width: 800,
         height: 800,
-        alt: "Hamid Oil Flour and Dal Mill Logo Square",
+        alt: "Hamid Oil Flour and Dal Mill Logo",
       },
     ],
     locale: "en_US",
@@ -44,17 +44,16 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Hamid Oil Flour and Dal Mill",
     description: "Premium quality oil, flour, and dal products",
-    images: ["/logo.JPG"],
+    images: ["https://i.imgur.com/RRI2tEI.png"],
   },
 
-  // Favicon
+  // Favicon using external logo
   icons: {
-    icon: "/logo.PNG",
-    shortcut: "/logo.PNG",
-    apple: "/logo.PNG",
+    icon: "https://i.imgur.com/RRI2tEI.png",
+    shortcut: "https://i.imgur.com/RRI2tEI.png",
+    apple: "https://i.imgur.com/RRI2tEI.png",
   },
 
-  // Theme color (optional - matches our primary green)
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
