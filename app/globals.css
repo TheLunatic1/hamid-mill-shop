@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+@plugin "daisyui";
+
+/* Enable only our two custom themes + auto dark mode preference */
+@plugin "daisyui" {
+  themes: hamidlight --default, hamiddark --prefersdark;
+  logs: false;
+}
+
+/* Light theme: Fresh, earthy, bright (oils, grains, flour vibe) */
+@plugin "daisyui/theme" {
+  name: "hamidlight";
+  default: true;
+  color-scheme: light;
+
+  --color-base-100: oklch(99% 0.01 100);     /* Clean white */
+  --color-base-200: oklch(95% 0.02 100);
+  --color-base-300: oklch(90% 0.03 100);
+  --color-base-content: oklch(20% 0.05 100); /* Dark text */
+
+  --color-primary: oklch(65% 0.2 140);       /* Fresh green */
+  --color-primary-content: oklch(98% 0.01 100);
+
+  --color-secondary: oklch(70% 0.15 80);     /* Warm golden yellow/brown */
+  --color-secondary-content: oklch(20% 0.05 100);
+
+  --color-accent: oklch(60% 0.25 50);        /* Earthy orange */
+  --color-accent-content: oklch(98% 0.01 100);
+
+  --color-neutral: oklch(85% 0.05 200);      /* Soft grain neutral */
+  --color-neutral-content: oklch(20% 0.05 100);
+
+  --color-info: oklch(65% 0.2 220);
+  --color-success: oklch(70% 0.2 140);
+  --color-warning: oklch(75% 0.2 80);
+  --color-error: oklch(65% 0.25 20);
+
+  --radius-btn: 0.5rem;
+  --radius-card: 1rem;
+}
+
+/* Dark theme: Cozy, deep earthy tones */
+@plugin "daisyui/theme" {
+  name: "hamiddark";
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: oklch(18% 0.02 200);     /* Deep dark neutral (like rich soil) */
+  --color-base-200: oklch(22% 0.03 200);
+  --color-base-300: oklch(26% 0.04 200);
+  --color-base-content: oklch(90% 0.02 100); /* Light text for readability */
+
+  --color-primary: oklch(55% 0.18 140);      /* Deeper green */
+  --color-primary-content: oklch(95% 0.01 100);
+
+  --color-secondary: oklch(60% 0.15 70);     /* Muted warm brown */
+  --color-secondary-content: oklch(90% 0.02 100);
+
+  --color-accent: oklch(55% 0.22 50);        /* Subtle earthy orange */
+  --color-accent-content: oklch(95% 0.01 100);
+
+  --color-neutral: oklch(30% 0.05 200);      /* Darker neutral */
+  --color-neutral-content: oklch(85% 0.02 100);
+
+  --color-info: oklch(60% 0.18 220);
+  --color-success: oklch(60% 0.18 140);
+  --color-warning: oklch(70% 0.2 80);
+  --color-error: oklch(60% 0.25 20);
+
+  --radius-btn: 0.5rem;
+  --radius-card: 1rem;
+}
