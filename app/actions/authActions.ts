@@ -51,9 +51,15 @@ export async function registerAction(
 
     const hashedPassword = await bcrypt.hash(data.password, 12);
 
-    const addresses = [{ type: "home", address: data.homeAddress } as const];
-    if (data.workAddress) addresses.push({ type: "work", address: data.workAddress });
-    if (data.courierAddress) addresses.push({ type: "courier", address: data.courierAddress });
+    const addresses: { type: "home" | "work" | "courier"; address: string }[] = [
+      { type: "home", address: data.homeAddress },
+    ];
+    if (data.workAddress) {
+      addresses.push({ type: "work", address: data.workAddress });
+    }
+    if (data.courierAddress) {
+      addresses.push({ type: "courier", address: data.courierAddress });
+    }
 
     await User.create({
       name: data.name,
