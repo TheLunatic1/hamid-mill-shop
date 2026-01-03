@@ -6,6 +6,9 @@ import User from "@/models/User";
 import bcrypt from "bcrypt";
 import { redirect } from "next/navigation";
 
+import { SignJWT } from "jose";
+import { cookies } from "next/headers";
+
 export interface RegisterState {
   error?: string;
 }
@@ -87,5 +90,86 @@ export async function registerAction(
   }
 
   // Fallback (should never reach here)
+  return { error: "Unexpected error" };
+}
+
+
+
+
+
+
+
+export interface LoginState {
+  error?: string;
+}
+
+export async function loginAction(
+  prevState: LoginState,
+  formData: FormData
+): Promise<LoginState> {
+  const identifier = formData.get("identifier") as string; // email or phone
+  const password = formData.get("password") as string;
+
+  if (!identifier || !password) {
+    return { error: "Please enter email/phone and password" };
+  }
+
+  let success = false;
+
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!);
+
+    const user = await User.findOne({
+      $or: [{ email: identifier.toLowerCase() }, { phone: identifier }],
+    });
+
+    if (!user) {
+      return { error: "Invalid credentials" };
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return { error: "Invalid credentials" };
+    }
+
+    // Create JWT payload
+    const payload = {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    };
+
+    // Sign JWT with secret
+    const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
+    const alg = "HS256";
+
+    const jwt = await new SignJWT(payload)
+      .setProtectedHeader({ alg })
+      .setIssuedAt()
+      .setExpirationTime("7d") // 7 days
+      .sign(secret);
+
+    // Set httpOnly cookie
+const cookieStore = await cookies();
+    cookieStore.set("auth_token", jwt, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: "/",
+    });
+
+    success = true;
+  } catch (error: unknown) {
+    console.error("Login error:", error);
+    return { error: "Login failed. Please try again." };
+  }
+
+  if (success) {
+    redirect("/"); // or "/dashboard" later
+  }
+
   return { error: "Unexpected error" };
 }
