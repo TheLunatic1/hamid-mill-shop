@@ -13,7 +13,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const verifyToken = async () => {
     try {
-      const res = await fetch("/api/auth/me", { 
+      const res = await fetch("/api/auth/me?ts=" + Date.now(), { 
         credentials: "include",
         cache: "no-store"  // Important: always fresh
       });
