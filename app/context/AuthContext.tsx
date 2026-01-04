@@ -12,32 +12,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
 const verifyToken = async () => {
+  console.log("AuthContext - Starting auth check");  // ← Debug
+
   try {
-    // Extract Vercel protection token from document.cookie (it's not httpOnly)
-    const vercelJwtMatch = document.cookie.match(/_vercel_jwt=([^;]+)/);
-    const vercelJwt = vercelJwtMatch ? vercelJwtMatch[1] : null;
-
-    const headers = new Headers();
-    headers.append("credentials", "include"); // Ensure browser sends cookies
-
-    if (vercelJwt) {
-      headers.append("Authorization", `Bearer ${vercelJwt}`);
-    }
-
-    const res = await fetch("/api/auth/me", {
+    const res = await fetch("/api/auth/me", { 
       credentials: "include",
       cache: "no-store",
-      headers,
     });
+
+    console.log("AuthContext - /api/auth/me status:", res.status);  // ← Debug
 
     if (res.ok) {
       const data = await res.json();
+      console.log("AuthContext - User fetched:", data.user?.name || "No user");  // ← Debug
       setUser(data.user);
     } else {
+      console.log("AuthContext - Auth failed (401 or other)");  // ← Debug
       setUser(null);
     }
   } catch (err) {
-    console.error("Auth check failed:", err);
+    console.error("AuthContext - Fetch error:", err);  // ← Debug
     setUser(null);
   } finally {
     setLoading(false);
