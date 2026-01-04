@@ -13,7 +13,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 const verifyToken = async () => {
   try {
-    // Manually read and forward ALL cookies (including _vercel_jwt if protection is on)
+    // Forward the raw cookie string to bypass protection interference
     const cookieString = document.cookie;
     const headers = new Headers();
     if (cookieString) {
@@ -33,7 +33,7 @@ const verifyToken = async () => {
       setUser(null);
     }
   } catch (err) {
-    console.error("Auth check error:", err);
+    console.error("Auth fetch error:", err);
     setUser(null);
   } finally {
     setLoading(false);
