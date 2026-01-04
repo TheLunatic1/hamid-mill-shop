@@ -11,26 +11,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const verifyToken = async () => {
+const verifyToken = async () => {
   try {
-    const vercelJwt = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('_vercel_jwt='))
-      ?.split('=')[1];
+    // Manually forward all cookies (bypasses Vercel protection interference)
+    const cookieHeader = document.cookie ? `Cookie: ${document.cookie}` : "";
 
-    const headers = new Headers();
-    headers.append('Cookie', document.cookie);  // Send all cookies
-    if (vercelJwt) {
-      headers.append('Authorization', `Bearer ${vercelJwt}`);  // Some cases need this
-    }
-
-    const res = await fetch("/api/auth/me", { 
+    const res = await fetch("/api/auth/me", {
       credentials: "include",
       cache: "no-store",
-      headers,
+      headers: {
+        ...(cookieHeader && { Cookie: document.cookie }),
+      },
     });
-    // ... rest unchanged
-  } catch {
+
+    if (res.ok) {
+      const data = await res.json();
+      setUser(data.user);
+    } else {
+      setUser(null);
+    }
+  } catch (err) {
     setUser(null);
   } finally {
     setLoading(false);
