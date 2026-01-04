@@ -13,11 +13,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 const verifyToken = async () => {
   try {
-    // Forward the raw cookie string to bypass protection interference
-    const cookieString = document.cookie;
+    // Extract Vercel protection cookie if present
+    const matches = document.cookie.match(/(^|; )_vercel_jwt=([^;]*)/);
+    const vercelJwt = matches ? matches[2] : null;
+
     const headers = new Headers();
-    if (cookieString) {
-      headers.append("Cookie", cookieString);
+    headers.append('credentials', 'include'); // Ensure cookies sent
+
+    if (vercelJwt) {
+      headers.append('Authorization', `Bearer ${vercelJwt}`);
     }
 
     const res = await fetch("/api/auth/me", {
@@ -33,7 +37,7 @@ const verifyToken = async () => {
       setUser(null);
     }
   } catch (err) {
-    console.error("Auth fetch error:", err);
+    console.error("Auth check error:", err);
     setUser(null);
   } finally {
     setLoading(false);
