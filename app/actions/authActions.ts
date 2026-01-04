@@ -86,7 +86,7 @@ export async function registerAction(
 
   // Redirect ONLY on success (outside try/catch)
   if (success) {
-    redirect("/login?registered=true");
+    throw new Error("LOGIN_REDIRECT:" + "/");
   }
 
   // Fallback (should never reach here)
@@ -101,20 +101,19 @@ export async function registerAction(
 
 export interface LoginState {
   error?: string;
+  success?: boolean;  // Add this
 }
 
 export async function loginAction(
   prevState: LoginState,
   formData: FormData
 ): Promise<LoginState> {
-  const identifier = formData.get("identifier") as string; // email or phone
+  const identifier = formData.get("identifier") as string;
   const password = formData.get("password") as string;
 
   if (!identifier || !password) {
     return { error: "Please enter email/phone and password" };
   }
-
-  let success = false;
 
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
@@ -141,35 +140,47 @@ export async function loginAction(
       role: user.role,
     };
 
-    // Sign JWT with secret
     const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
     const alg = "HS256";
 
     const jwt = await new SignJWT(payload)
       .setProtectedHeader({ alg })
       .setIssuedAt()
-      .setExpirationTime("7d") // 7 days
+      .setExpirationTime("7d")
       .sign(secret);
 
     // Set httpOnly cookie
-const cookieStore = await cookies();
+    const cookieStore = await cookies();
     cookieStore.set("auth_token", jwt, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
 
-    success = true;
+    // Return success instead of redirect
+    return { success: true };
   } catch (error: unknown) {
     console.error("Login error:", error);
     return { error: "Login failed. Please try again." };
   }
-
-  if (success) {
-    redirect("/"); // or "/dashboard" later
-  }
-
-  return { error: "Unexpected error" };
 }
+
+
+
+
+
+
+export async function logoutAction() {
+  "use server";
+
+  const cookieStore = await cookies();
+  cookieStore.delete("auth_token");
+
+  redirect("/");
+}
+
+
+
+
