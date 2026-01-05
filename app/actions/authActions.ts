@@ -46,7 +46,7 @@ async function setAuthCookie(user: {
   const cookieStore = await cookies();
   cookieStore.set("auth_token", jwt, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
