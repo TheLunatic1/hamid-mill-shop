@@ -109,7 +109,7 @@ export async function registerAction(
     });
 
     await setAuthCookie(newUser);
-    redirect("/");
+    redirect("/account");
   } catch (error) {
     console.error("Registration error:", error);
     return { error: "Registration failed. Please try again." };
@@ -144,7 +144,7 @@ export async function loginAction(
     }
 
     await setAuthCookie(user);
-    redirect("/");
+    redirect("/account");
     return { success: true };
   } catch (error) {
     console.error("Login error:", error);

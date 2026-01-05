@@ -4,10 +4,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { loginAction, LoginState } from "@/actions/authActions";
-import { useFormState } from "react-dom";
+import { useActionState } from "react";  // ← Updated import
 
 export default function LoginForm() {
-  const [state, formAction, isPending] = useFormState<LoginState, FormData>(
+  const [state, formAction, isPending] = useActionState<LoginState, FormData>(
     loginAction,
     { error: undefined }
   );
@@ -67,9 +67,6 @@ export default function LoginForm() {
                 required
                 disabled={isPending}
               />
-              <label className="label justify-end">
-                <a href="#" className="label-text-alt link link-primary">Forgot password?</a>
-              </label>
             </div>
 
             <button
