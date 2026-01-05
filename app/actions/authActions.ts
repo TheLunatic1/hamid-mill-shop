@@ -13,6 +13,40 @@ export interface RegisterState {
   error?: string;
 }
 
+export interface LoginState {
+  error?: string;
+  success?: boolean;
+}
+
+// Helper to create and set JWT cookie
+async function setAuthCookie(user: any) {
+  const payload = {
+    id: user._id.toString(),
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    role: user.role,
+  };
+
+  const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
+  const alg = "HS256";
+
+  const jwt = await new SignJWT(payload)
+    .setProtectedHeader({ alg })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .sign(secret);
+
+  const cookieStore = await cookies();
+  cookieStore.set("auth_token", jwt, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production", // secure in prod
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 7, // 7 days
+    path: "/",
+  });
+}
+
 export async function registerAction(
   prevState: RegisterState,
   formData: FormData
@@ -39,8 +73,6 @@ export async function registerAction(
     return { error: "Password must be at least 6 characters" };
   }
 
-  let success = false;
-
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
 
@@ -57,6 +89,7 @@ export async function registerAction(
     const addresses: { type: "home" | "work" | "courier"; address: string }[] = [
       { type: "home", address: data.homeAddress },
     ];
+
     if (data.workAddress) {
       addresses.push({ type: "work", address: data.workAddress });
     }
@@ -64,44 +97,23 @@ export async function registerAction(
       addresses.push({ type: "courier", address: data.courierAddress });
     }
 
-    await User.create({
+    const newUser = await User.create({
       name: data.name,
       email: data.email,
       phone: data.phone,
       password: hashedPassword,
-      role: "buyer",
+      role: "buyer", // default role
       addresses,
     });
 
-    success = true; // Only set if everything worked
+    // Auto-login after registration
+    await setAuthCookie(newUser);
+
+    redirect("/"); // or "/account" if you prefer
   } catch (error: unknown) {
     console.error("Registration error:", error);
-
-    if (error && typeof error === "object" && "code" in error && (error as any).code === 11000) {
-      return { error: "Email or phone already exists" };
-    }
-
-    return { error: "Registration failed. Please try again later." };
+    return { error: "Registration failed. Please try again." };
   }
-
-  // Redirect ONLY on success (outside try/catch)
-  if (success) {
-    throw new Error("LOGIN_REDIRECT:" + "/");
-  }
-
-  // Fallback (should never reach here)
-  return { error: "Unexpected error" };
-}
-
-
-
-
-
-
-
-export interface LoginState {
-  error?: string;
-  success?: boolean;  // Add this
 }
 
 export async function loginAction(
@@ -131,46 +143,14 @@ export async function loginAction(
       return { error: "Invalid credentials" };
     }
 
-    // Create JWT payload
-    const payload = {
-      id: user._id.toString(),
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-    };
+    await setAuthCookie(user);
 
-    const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
-    const alg = "HS256";
-
-    const jwt = await new SignJWT(payload)
-      .setProtectedHeader({ alg })
-      .setIssuedAt()
-      .setExpirationTime("7d")
-      .sign(secret);
-
-    // Set httpOnly cookie
-    const cookieStore = await cookies();
-    cookieStore.set("auth_token", jwt, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7,
-      path: "/",
-    });
-
-    // Return success instead of redirect
-    return { success: true };
+    redirect("/"); // Redirect after successful login
   } catch (error: unknown) {
     console.error("Login error:", error);
     return { error: "Login failed. Please try again." };
   }
 }
-
-
-
-
-
 
 export async function logoutAction() {
   "use server";
@@ -180,7 +160,3 @@ export async function logoutAction() {
 
   redirect("/");
 }
-
-
-
-

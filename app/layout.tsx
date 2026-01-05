@@ -1,4 +1,6 @@
+// app/layout.tsx
 import type { Metadata } from "next";
+import type { Viewport } from "next";  // ← Add this import
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
@@ -6,6 +8,7 @@ import { AuthProvider } from "./context/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
+// Keep metadata as before (but without themeColor)
 export const metadata: Metadata = {
   title: {
     default: "Hamid Oil Flour and Dal Mill",
@@ -27,7 +30,7 @@ export const metadata: Metadata = {
       {
         url: "https://i.imgur.com/RRI2tEI.png",
         width: 1200,
-        height: 675,   // fits the oval badge shape
+        height: 675,
         alt: "Hamid Oil Flour and Dal Mill Logo - HOFDM",
       },
       {
@@ -49,13 +52,16 @@ export const metadata: Metadata = {
     images: ["https://i.imgur.com/RRI2tEI.png"],
   },
 
-  // Favicon using external logo
+  // Favicon
   icons: {
     icon: "https://i.imgur.com/RRI2tEI.png",
     shortcut: "https://i.imgur.com/RRI2tEI.png",
     apple: "https://i.imgur.com/RRI2tEI.png",
   },
+};
 
+// ← New viewport export with themeColor
+export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#1a1a1a" },
@@ -68,7 +74,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en"  data-theme="hamidlight">
+    <html lang="en" data-theme="hamidlight">
       <body className={inter.className}>
         <AuthProvider>
           <Navbar />

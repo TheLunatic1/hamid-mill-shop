@@ -6,18 +6,22 @@ export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("auth_token")?.value;
 
-  console.log("API /me - Token received:", token ? "Yes (length: " + token.length + ")" : "No");  // ← Debug log
+  console.log("=== /api/auth/me called ===");
+  console.log("Token present:", !!token);
+  console.log("Token length:", token ? token.length : 0);
+  console.log("Token preview:", token ? token.substring(0, 50) + "..." : "none");
+  console.log("NEXTAUTH_SECRET present:", !!process.env.NEXTAUTH_SECRET);
 
   if (!token) {
-    console.log("API /me - No token → 401");  // ← Debug
-    return Response.json({ user: null }, { status: 401 });
+    return Response.json({ error: "No token" }, { status: 401 });
   }
 
   try {
     const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET!);
     const { payload } = await jwtVerify(token, secret);
 
-    console.log("API /me - Token verified successfully for user:", payload.email);  // ← Debug
+    console.log("Token verified successfully");
+    console.log("Payload:", payload);
 
     const user = {
       id: payload.id as string,
@@ -29,7 +33,7 @@ export async function GET() {
 
     return Response.json({ user });
   } catch (error) {
-    console.error("API /me - Token verification failed:", error);  // ← Debug
-    return Response.json({ user: null }, { status: 401 });
+    console.error("JWT verification failed:", error);
+    return Response.json({ error: "Invalid token" }, { status: 401 });
   }
 }

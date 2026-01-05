@@ -1,0 +1,53 @@
+Folder PATH listing for volume SSD1
+Volume serial number is 819A-85F8
+G:.
+ª   favicon.ico
+ª   globals.css
+ª   layout.tsx
+ª   page.tsx
+ª   structure (2).txt
+ª   structure.txt
+ª   tree_output.txt
+ª   
++---account
+ª       AccountLayout.tsx
+ª       AccountWelcome.tsx
+ª       page.tsx
+ª       
++---actions
+ª       authActions.ts
+ª       
++---admin
+ª       AdminLayout.tsx
+ª       page.tsx
+ª       
++---api
+ª   +---auth
+ª       +---me
+ª               route.ts
+ª               
++---components
+ª       AuthRedirect.tsx
+ª       Navbar.tsx
+ª       
++---context
+ª       AuthContext.tsx
+ª       
++---lib
+ª       mongodb.ts
+ª       
++---login
+ª       LoginForm.tsx
+ª       page.tsx
+ª       
++---models
+ª       Product.ts
+ª       User.ts
+ª       
++---register
+ª       page.tsx
+ª       RegisterForm.tsx
+ª       
++---types
+        auth.ts
+        
