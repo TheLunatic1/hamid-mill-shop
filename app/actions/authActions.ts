@@ -145,9 +145,10 @@ export async function loginAction(
 
     await setAuthCookie(user);
     redirect("/");
+    return { success: true };
   } catch (error) {
     console.error("Login error:", error);
-    return { error: "Login failed. Please try again." };
+    return { error: "Invalid email/phone or password" };
   }
 }
 

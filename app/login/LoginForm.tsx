@@ -4,13 +4,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { loginAction, LoginState } from "@/actions/authActions";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState<LoginState, FormData>(
     loginAction,
     { error: undefined }
   );
+
+  const router = useRouter();
+
+  // Handle successful login (redirect was triggered server-side)
+  useEffect(() => {
+    if (state && !state.error) {
+      // Small success feedback before redirect
+      router.push("/");
+    }
+  }, [state, router]);
 
   const logoUrl = "https://i.imgur.com/RRI2tEI.png";
 
@@ -31,6 +42,17 @@ export default function LoginForm() {
             <p className="text-base-content/70 mt-2">Login to your account</p>
           </div>
 
+          {/* Success message (brief) */}
+          {state && !state.error && (
+            <div className="alert alert-success shadow-lg mb-6">
+              <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>Login successful! Redirecting...</span>
+            </div>
+          )}
+
+          {/* Error message */}
           {state?.error && (
             <div className="alert alert-error shadow-lg mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
@@ -51,6 +73,7 @@ export default function LoginForm() {
                 placeholder="you@example.com or +91XXXXXXXXXX"
                 className="input input-bordered w-full"
                 required
+                disabled={isPending}
               />
             </div>
 
@@ -64,13 +87,15 @@ export default function LoginForm() {
                 placeholder="••••••••"
                 className="input input-bordered w-full"
                 required
+                disabled={isPending}
               />
-              <label className="label justify-end">
-                <a href="#" className="label-text-alt link link-primary">Forgot password?</a>
-              </label>
             </div>
 
-            <button type="submit" className="btn btn-primary w-full btn-lg" disabled={isPending}>
+            <button
+              type="submit"
+              className="btn btn-primary w-full btn-lg"
+              disabled={isPending}
+            >
               {isPending ? "Logging in..." : "Login"}
             </button>
           </form>
