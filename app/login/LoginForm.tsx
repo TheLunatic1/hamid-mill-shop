@@ -4,8 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { loginAction, LoginState } from "@/actions/authActions";
-import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useActionState } from "react";
 
 export default function LoginForm() {
   const [state, formAction, isPending] = useActionState<LoginState, FormData>(
@@ -13,12 +12,6 @@ export default function LoginForm() {
     { error: undefined }
   );
 
-  const router = useRouter();
-  useEffect(() => {
-    if (state?.success) {
-      window.location.href = "/";  // Full reload → cookie guaranteed available
-    }
-  }, [state]);
   const logoUrl = "https://i.imgur.com/RRI2tEI.png";
 
   return (

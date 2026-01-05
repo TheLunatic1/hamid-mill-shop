@@ -19,7 +19,13 @@ export interface LoginState {
 }
 
 // Helper to create and set JWT cookie
-async function setAuthCookie(user: any) {
+async function setAuthCookie(user: {
+  _id: mongoose.Types.ObjectId;
+  name: string;
+  email: string;
+  phone: string;
+  role: "buyer" | "admin";
+}) {
   const payload = {
     id: user._id.toString(),
     name: user.name,
@@ -40,7 +46,7 @@ async function setAuthCookie(user: any) {
   const cookieStore = await cookies();
   cookieStore.set("auth_token", jwt, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // secure in prod
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: 60 * 60 * 24 * 7, // 7 days
     path: "/",
@@ -90,27 +96,21 @@ export async function registerAction(
       { type: "home", address: data.homeAddress },
     ];
 
-    if (data.workAddress) {
-      addresses.push({ type: "work", address: data.workAddress });
-    }
-    if (data.courierAddress) {
-      addresses.push({ type: "courier", address: data.courierAddress });
-    }
+    if (data.workAddress) addresses.push({ type: "work", address: data.workAddress });
+    if (data.courierAddress) addresses.push({ type: "courier", address: data.courierAddress });
 
     const newUser = await User.create({
       name: data.name,
       email: data.email,
       phone: data.phone,
       password: hashedPassword,
-      role: "buyer", // default role
+      role: "buyer",
       addresses,
     });
 
-    // Auto-login after registration
     await setAuthCookie(newUser);
-
-    redirect("/"); // or "/account" if you prefer
-  } catch (error: unknown) {
+    redirect("/");
+  } catch (error) {
     console.error("Registration error:", error);
     return { error: "Registration failed. Please try again." };
   }
@@ -144,9 +144,8 @@ export async function loginAction(
     }
 
     await setAuthCookie(user);
-
-    redirect("/"); // Redirect after successful login
-  } catch (error: unknown) {
+    redirect("/");
+  } catch (error) {
     console.error("Login error:", error);
     return { error: "Login failed. Please try again." };
   }
