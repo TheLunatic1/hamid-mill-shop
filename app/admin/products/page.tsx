@@ -27,7 +27,7 @@ async function getAllProducts(): Promise<ProductType[]> {
       .sort({ createdAt: -1 })
       .lean();
 
-    return raw.map((doc: any) => ({
+    return raw.map((doc) => ({
       _id: doc._id.toString(),
       name: doc.name,
       price: doc.price,

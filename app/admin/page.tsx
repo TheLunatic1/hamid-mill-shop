@@ -27,7 +27,7 @@ async function getAllProducts(): Promise<ProductType[]> {
       .sort({ createdAt: -1 })
       .lean();
 
-    return raw.map((doc: any) => ({
+    return raw.map((doc) => ({
       _id: doc._id.toString(),
       name: doc.name,
       price: doc.price,
@@ -102,7 +102,7 @@ export default async function AdminDashboard() {
 
               {products.length === 0 ? (
                 <div className="alert alert-info">
-                  <span>No products added yet. Click "Add New" to start.</span>
+                  <span>No products added yet. Click &quot;Add New&quot; to start.</span>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
