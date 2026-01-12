@@ -18,7 +18,7 @@ async function getProducts() {
       .sort({ createdAt: -1 })
       .lean();
 
-    return rawProducts.map((doc: any) => ({
+    return rawProducts.map((doc) => ({
       _id: doc._id.toString(),
       name: doc.name,
       price: doc.price,
@@ -26,7 +26,15 @@ async function getProducts() {
       description: doc.description,
       stock: doc.stock,
       imageUrl: doc.imageUrl,
-    }));
+    })) as Array<{
+      _id: string;
+      name: string;
+      price: number;
+      unit: string;
+      description: string;
+      stock: number;
+      imageUrl: string;
+    }>;
   } catch (error) {
     console.error("Products fetch error:", error);
     return [];
