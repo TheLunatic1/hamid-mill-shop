@@ -1,28 +1,41 @@
 // app/products/page.tsx
 import { Metadata } from "next";
+import Image from "next/image";
 import ProductCard from "@/components/ProductCard";
 import Product from "@/models/Product";
 import mongoose from "mongoose";
 import React from "react";
-import ProductModals from "@/components/ProductModals";
+
+interface ProductType {
+  _id: string;
+  name: string;
+  price: number;
+  unit: string;
+  description?: string;
+  stock?: number;
+  imageUrl?: string;
+}
 
 export const metadata: Metadata = {
   title: "Our Products | Hamid Oil Flour and Dal Mill",
   description: "Premium quality mustard oil, atta, dal, and grains directly from the mill",
 };
 
-async function getProducts() {
+async function getProducts(): Promise<ProductType[]> {
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
-    const rawProducts = await Product.find({ hidden: { $ne: true } })
+    const raw = await Product.find({ hidden: { $ne: true } })
       .sort({ createdAt: -1 })
       .lean();
 
-    return rawProducts.map((doc: any) => ({
-      ...doc,
+    return raw.map((doc: any) => ({
       _id: doc._id.toString(),
-      createdAt: doc.createdAt?.toISOString(),
-      updatedAt: doc.updatedAt?.toISOString(),
+      name: doc.name,
+      price: doc.price,
+      unit: doc.unit,
+      description: doc.description,
+      stock: doc.stock,
+      imageUrl: doc.imageUrl,
     }));
   } catch (error) {
     console.error("Products fetch error:", error);
@@ -58,13 +71,70 @@ export default async function ProductsPage() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product: any) => (
+          {products.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
         </div>
 
-        {/* All modals are now handled by a client component */}
-        <ProductModals products={products} />
+        {/* Modals */}
+        {products.map((product) => (
+          <dialog id={`modal-${product._id}`} className="modal modal-bottom sm:modal-middle" key={product._id}>
+            <div className="modal-box max-w-2xl">
+              <form method="dialog">
+                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+              </form>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <figure>
+                  <Image
+                    src={product.imageUrl || "/placeholder.jpg"}
+                    alt={product.name}
+                    width={500}
+                    height={500}
+                    className="rounded-xl object-cover w-full aspect-square"
+                  />
+                </figure>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-3xl font-bold text-primary">{product.name}</h3>
+                    <p className="text-2xl font-semibold text-secondary mt-2">
+                      ৳{product.price} / {product.unit}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Description</h4>
+                    <p className="text-base-content/80">{product.description}</p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Stock</h4>
+                    <p className="text-sm text-base-content/60">
+                      {product.stock} units available
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold text-lg mb-2">Payment Options</h4>
+                    <ul className="space-y-2 text-base-content/80">
+                      <li>• Cash on Delivery (COD)</li>
+                      <li>• bKash</li>
+                      <li>• Nagad</li>
+                      <li>• Bank Transfer / Rocket</li>
+                    </ul>
+                  </div>
+
+                  <div className="modal-action">
+                    <button className="btn btn-primary btn-lg w-full">
+                      Add to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </dialog>
+        ))}
       </div>
     </div>
   );

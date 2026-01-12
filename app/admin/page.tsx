@@ -1,186 +1,174 @@
-// app/products/page.tsx
+// app/admin/page.tsx
 import { Metadata } from "next";
-import Image from "next/image";
-import ProductCard from "@/components/ProductCard";
+import AdminLayout from "./AdminLayout";
 import Product from "@/models/Product";
 import mongoose from "mongoose";
-import React from "react";
-
-// Tiny Client Component — only this part has onClick
-function ClickableImage({
-  product,
-}: {
-  product: { _id: string; imageUrl?: string; name: string };
-}) {
-  return (
-    <Image
-      src={product.imageUrl || "/placeholder.jpg"}
-      alt={product.name}
-      width={500}
-      height={500}
-      className="rounded-xl object-cover w-full aspect-square cursor-zoom-in hover:opacity-90 transition-opacity"
-      onClick={() => {
-        const enlarge = document.getElementById(`enlarge-${product._id}`) as HTMLDialogElement | null;
-        if (enlarge) enlarge.showModal();
-      }}
-    />
-  );
-}
+import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Our Products | Hamid Oil Flour and Dal Mill",
-  description: "Premium quality mustard oil, atta, dal, and grains directly from the mill",
+  title: "Admin Dashboard | Hamid Oil Flour and Dal Mill",
 };
 
-async function getProducts() {
+interface ProductType {
+  _id: string;
+  name: string;
+  price: number;
+  unit: string;
+  stock: number;
+  hidden: boolean;
+  imageUrl?: string;
+}
+
+async function getAllProducts(): Promise<ProductType[]> {
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
-    const rawProducts = await Product.find({ hidden: { $ne: true } })
+    const raw = await Product.find({})
       .sort({ createdAt: -1 })
       .lean();
 
-    return rawProducts.map((doc: any) => ({
-      ...doc,
+    return raw.map((doc: any) => ({
       _id: doc._id.toString(),
-      createdAt: doc.createdAt?.toISOString(),
-      updatedAt: doc.updatedAt?.toISOString(),
+      name: doc.name,
+      price: doc.price,
+      unit: doc.unit,
+      stock: doc.stock,
+      hidden: doc.hidden,
+      imageUrl: doc.imageUrl,
     }));
   } catch (error) {
-    console.error("Products fetch error:", error);
+    console.error("Admin products fetch error:", error);
     return [];
   }
 }
 
-export default async function ProductsPage() {
-  const products = await getProducts();
-
-  if (products.length === 0) {
-    return (
-      <div className="min-h-screen bg-base-200 pt-20 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-5xl font-bold text-primary mb-6">Products Coming Soon!</h1>
-          <p className="text-xl text-secondary">Admin is adding fresh items right now</p>
-        </div>
-      </div>
-    );
-  }
+export default async function AdminDashboard() {
+  const products = await getAllProducts();
 
   return (
-    <div className="min-h-screen bg-base-200 pt-20">
-      <div className="container mx-auto px-6 py-12">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-primary mb-4">
-            Our Premium Products
-          </h1>
-          <p className="text-xl text-secondary max-w-3xl mx-auto">
-            Pure, fresh mustard oil, whole wheat atta, moong dal, chana dal and more – 
-            directly from Hamid Oil Flour and Dal Mill to your kitchen.
-          </p>
-        </div>
+    <AdminLayout>
+      <div className="min-h-screen bg-base-200">
+        <div className="container mx-auto p-8">
+          <h1 className="text-4xl font-bold text-primary mb-8">Admin Dashboard</h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {products.map((product: any) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-
-        {/* Modals */}
-        {products.map((product: any) => (
-          <React.Fragment key={product._id}>
-            {/* Description Modal */}
-            <dialog id={`modal-${product._id}`} className="modal modal-bottom sm:modal-middle">
-              <div className="modal-box max-w-2xl">
-                <form method="dialog">
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                </form>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  <figure>
-                    <ClickableImage product={product} />
-                  </figure>
-
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-3xl font-bold text-primary">{product.name}</h3>
-                      <p className="text-2xl font-semibold text-secondary mt-2">
-                        ৳{product.price} / {product.unit}
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-lg mb-2">Description</h4>
-                      <p className="text-base-content/80">{product.description || "No description available."}</p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-lg mb-2">Stock</h4>
-                      <p className="text-sm text-base-content/60">
-                        {product.stock || 0} units available
-                      </p>
-                    </div>
-
-                    <div>
-                      <h4 className="font-semibold text-lg mb-2">Payment Options</h4>
-                      <ul className="space-y-2 text-base-content/80">
-                        <li>• Cash on Delivery (COD)</li>
-                        <li>• bKash</li>
-                        <li>• Nagad</li>
-                        <li>• Bank Transfer / Rocket</li>
-                      </ul>
-                    </div>
-
-                    <div className="modal-action flex flex-col sm:flex-row gap-4 w-full">
-                      <div className="join w-full sm:w-auto">
-                        <button className="btn join-item">-</button>
-                        <input
-                          type="number"
-                          className="input input-bordered join-item w-20 text-center"
-                          defaultValue={1}
-                          min={1}
-                          max={product.stock || 999}
-                        />
-                        <button className="btn join-item">+</button>
-                      </div>
-
-                      <button className="btn btn-primary flex-1">
-                        Add to Cart
-                      </button>
-                    </div>
-                  </div>
+          {/* Quick Action Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            <div className="card bg-base-100 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title">Manage Products</h2>
+                <p>Add, edit, hide or delete products</p>
+                <div className="card-actions justify-end">
+                  <Link href="/admin/products/new" className="btn btn-primary">
+                    Add New Product
+                  </Link>
                 </div>
               </div>
+            </div>
 
-              <form method="dialog" className="modal-backdrop">
-                <button>close</button>
-              </form>
-            </dialog>
-
-            {/* Enlarged Image Modal */}
-            <dialog id={`enlarge-${product._id}`} className="modal">
-              <div className="modal-box p-0 max-w-[95vw] max-h-[95vh] relative">
-                <form method="dialog">
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4 z-10 bg-base-100/80">
-                    ✕
+            <div className="card bg-base-100 shadow-xl opacity-50">
+              <div className="card-body">
+                <h2 className="card-title">Orders</h2>
+                <p>View and manage customer orders</p>
+                <div className="card-actions justify-end">
+                  <button className="btn btn-primary" disabled>
+                    Coming Soon
                   </button>
-                </form>
+                </div>
+              </div>
+            </div>
 
-                <Image
-                  src={product.imageUrl || "/placeholder.jpg"}
-                  alt={`Enlarged view of ${product.name}`}
-                  width={1600}
-                  height={1600}
-                  className="w-full h-auto max-h-[90vh] object-contain rounded-lg transition-transform duration-300 hover:scale-150 cursor-zoom-in"
-                  priority
-                />
+            <div className="card bg-base-100 shadow-xl opacity-50">
+              <div className="card-body">
+                <h2 className="card-title">Users</h2>
+                <p>Manage customer accounts</p>
+                <div className="card-actions justify-end">
+                  <button className="btn btn-primary" disabled>
+                    Coming Soon
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Products Overview */}
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="card-title text-2xl">Products Overview</h2>
+                <Link href="/admin/products/new" className="btn btn-sm btn-primary">
+                  + Add New
+                </Link>
               </div>
 
-              <form method="dialog" className="modal-backdrop">
-                <button>close</button>
-              </form>
-            </dialog>
-          </React.Fragment>
-        ))}
+              {products.length === 0 ? (
+                <div className="alert alert-info">
+                  <span>No products added yet. Click "Add New" to start.</span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="table table-zebra w-full">
+                    <thead>
+                      <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Unit</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((product) => (
+                        <tr key={product._id}>
+                          <td>
+                            {product.imageUrl ? (
+                              <div className="avatar">
+                                <div className="w-12 rounded">
+                                  <Image
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    width={48}
+                                    height={48}
+                                    className="object-cover"
+                                  />
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-2xl">🌾</span>
+                            )}
+                          </td>
+                          <td>{product.name}</td>
+                          <td>৳{product.price}</td>
+                          <td>{product.unit}</td>
+                          <td>{product.stock}</td>
+                          <td>
+                            {product.hidden ? (
+                              <div className="badge badge-error">Hidden</div>
+                            ) : (
+                              <div className="badge badge-success">Visible</div>
+                            )}
+                          </td>
+                          <td>
+                            <div className="flex gap-2">
+                              <Link
+                                href={`/admin/products/${product._id}/edit`}
+                                className="btn btn-xs btn-info"
+                              >
+                                Edit
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

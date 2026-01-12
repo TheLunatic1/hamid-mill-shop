@@ -3,7 +3,6 @@
 
 import mongoose from "mongoose";
 import Product from "@/models/Product";
-import { redirect } from "next/navigation";
 
 export interface ProductFormState {
   error?: string;

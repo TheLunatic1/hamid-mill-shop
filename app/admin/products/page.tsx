@@ -10,11 +10,36 @@ export const metadata: Metadata = {
   title: "Manage Products | Admin Dashboard",
 };
 
-async function getAllProducts() {
-  await mongoose.connect(process.env.MONGODB_URI!);
-  return await Product.find({})
-    .sort({ createdAt: -1 })
-    .lean();
+interface ProductType {
+  _id: string;
+  name: string;
+  price: number;
+  unit: string;
+  stock: number;
+  hidden: boolean;
+  imageUrl?: string;
+}
+
+async function getAllProducts(): Promise<ProductType[]> {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!);
+    const raw = await Product.find({})
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return raw.map((doc: any) => ({
+      _id: doc._id.toString(),
+      name: doc.name,
+      price: doc.price,
+      unit: doc.unit,
+      stock: doc.stock,
+      hidden: doc.hidden,
+      imageUrl: doc.imageUrl,
+    }));
+  } catch (error) {
+    console.error("Admin products fetch error:", error);
+    return [];
+  }
 }
 
 export default async function AdminProductsPage() {
@@ -59,7 +84,7 @@ export default async function AdminProductsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product: any) => (
+                  {products.map((product) => (
                     <tr key={product._id}>
                       <td>
                         {product.imageUrl ? (
@@ -101,17 +126,6 @@ export default async function AdminProductsPage() {
                           >
                             Edit
                           </Link>
-
-                          <form action={`/api/admin/products/${product._id}/toggle`} method="POST">
-                            <button
-                              type="submit"
-                              className={`btn btn-sm ${product.hidden ? "btn-success" : "btn-warning"}`}
-                            >
-                              {product.hidden ? "Show" : "Hide"}
-                            </button>
-                          </form>
-
-                          {/* Delete – we'll add later if needed */}
                         </div>
                       </td>
                     </tr>
