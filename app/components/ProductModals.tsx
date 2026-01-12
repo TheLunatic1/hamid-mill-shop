@@ -37,7 +37,7 @@ export default function ProductModals({ products }: Props) {
                     alt={product.name}
                     width={500}
                     height={500}
-                    className="rounded-xl object-cover w-full aspect-square cursor-zoom-in hover:opacity-90 transition-opacity"
+                    className="rounded-xl object-cover w-full h-full cursor-zoom-in hover:opacity-90 transition-opacity"
                     onClick={() => {
                       const enlarge = document.getElementById(`enlarge-${product._id}`) as HTMLDialogElement | null;
                       if (enlarge) enlarge.showModal();
