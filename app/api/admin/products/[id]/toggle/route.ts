@@ -5,12 +5,13 @@ import Product from "@/models/Product";
 
 export async function POST(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }  // ← correct type with Promise (Next.js 15)
 ) {
   try {
-    const { id } = context.params;
+    const params = await context.params;  // ← await it (important in Next.js 15)
+    const id = params.id;
 
-    console.log("Toggle request for product ID:", id); // debug in terminal/logs
+    console.log("Toggle request received for ID:", id);
 
     if (!id) {
       return NextResponse.json({ error: "Product ID required" }, { status: 400 });
@@ -23,7 +24,6 @@ export async function POST(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    // Toggle hidden status
     product.hidden = !product.hidden;
     await product.save();
 
