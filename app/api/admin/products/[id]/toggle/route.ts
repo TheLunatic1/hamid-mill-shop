@@ -5,17 +5,11 @@ import Product from "@/models/Product";
 
 export async function POST(
   request: Request,
-  context: { params: Promise<{ id: string }> }  // ← correct type with Promise (Next.js 15)
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const params = await context.params;  // ← await it (important in Next.js 15)
+    const params = await context.params;
     const id = params.id;
-
-    console.log("Toggle request received for ID:", id);
-
-    if (!id) {
-      return NextResponse.json({ error: "Product ID required" }, { status: 400 });
-    }
 
     await mongoose.connect(process.env.MONGODB_URI!);
 
@@ -29,7 +23,7 @@ export async function POST(
 
     return NextResponse.json({ success: true, hidden: product.hidden });
   } catch (error) {
-    console.error("Toggle visibility error:", error);
-    return NextResponse.json({ error: "Failed to toggle visibility" }, { status: 500 });
+    console.error("Toggle error:", error);
+    return NextResponse.json({ error: "Failed to toggle" }, { status: 500 });
   }
 }

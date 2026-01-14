@@ -1,9 +1,8 @@
-// app/api/admin/products/route.ts
+// app/api/admin/products/route.ts (only for creating new products)
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Product from "@/models/Product";
 
-// POST: Create new product (already working)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
