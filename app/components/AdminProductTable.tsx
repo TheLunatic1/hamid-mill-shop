@@ -32,11 +32,13 @@ export default function AdminProductTable({ products }: Props) {
     try {
       const res = await fetch(`/api/admin/products/${id}/toggle`, {
         method: "POST",
-        headers: { "Cache-Control": "no-cache" }, // prevent caching
+        headers: { "Cache-Control": "no-cache" },
+        cache: "no-store", // prevent caching
       });
 
       if (res.ok) {
         router.refresh(); // refresh server data
+        router.replace(router.asPath, { scroll: false }); // refresh client components
       } else {
         alert("Failed to update visibility");
       }
@@ -52,6 +54,7 @@ export default function AdminProductTable({ products }: Props) {
       const res = await fetch(`/api/admin/products/${id}`, {
         method: "DELETE",
         headers: { "Cache-Control": "no-cache" },
+        cache: "no-store", // prevent caching
       });
 
       if (res.ok) {

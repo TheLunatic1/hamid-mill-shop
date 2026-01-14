@@ -21,6 +21,8 @@ interface ProductType {
   imageUrl?: string;
 }
 
+export const revalidate = 0;
+
 async function getAllProducts(): Promise<ProductType[]> {
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
