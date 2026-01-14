@@ -78,7 +78,7 @@ export default async function AdminDashboard() {
             </div>
           </div>
 
-          {/* Product Management */}
+          {/* Product Management Section */}
           <div className="card bg-base-100 shadow-2xl">
             <div className="card-body">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -96,9 +96,9 @@ export default async function AdminDashboard() {
               )}
             </div>
           </div>
-
-          {/* Modal is now in client component */}
+                        {/* Modal is now in client component */}
           <AddProductModal />
+          {/* Add New Product Modal - now in client component */}
         </div>
       </div>
     </AdminLayout>

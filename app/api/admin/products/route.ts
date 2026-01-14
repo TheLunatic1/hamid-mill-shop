@@ -1,4 +1,4 @@
-// app/api/admin/products/route.ts (only for creating new products)
+// app/api/admin/products/route.ts
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Product from "@/models/Product";
@@ -24,7 +24,18 @@ export async function POST(request: Request) {
       hidden: false,
     });
 
-    return NextResponse.json({ success: true, product: newProduct }, { status: 201 });
+    // ← Add cache-control headers here
+    return NextResponse.json(
+      { success: true, product: newProduct },
+      {
+        status: 201,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   } catch (error) {
     console.error("Create product error:", error);
     return NextResponse.json({ error: "Failed to create product" }, { status: 500 });

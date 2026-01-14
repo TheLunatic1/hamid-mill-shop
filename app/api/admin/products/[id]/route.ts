@@ -11,6 +11,10 @@ export async function DELETE(
     const params = await context.params;
     const id = params.id;
 
+    if (!id) {
+      return NextResponse.json({ error: "Product ID required" }, { status: 400 });
+    }
+
     await mongoose.connect(process.env.MONGODB_URI!);
 
     const deleted = await Product.findByIdAndDelete(id);
@@ -18,14 +22,25 @@ export async function DELETE(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true });
+    // ← Add cache-control headers here
+    return NextResponse.json(
+      { success: true },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   } catch (error) {
-    console.error("Delete error:", error);
+    console.error("Delete product error:", error);
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
   }
 }
 
-// Optional: if you have edit, add PATCH here too
+// Optional: If you have PATCH for edit, add it here too with same headers
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ id: string }> }
@@ -33,7 +48,6 @@ export async function PATCH(
   try {
     const params = await context.params;
     const id = params.id;
-
     const body = await request.json();
 
     await mongoose.connect(process.env.MONGODB_URI!);
@@ -43,9 +57,19 @@ export async function PATCH(
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, product: updated });
+    return NextResponse.json(
+      { success: true, product: updated },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   } catch (error) {
-    console.error("Update error:", error);
+    console.error("Update product error:", error);
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }

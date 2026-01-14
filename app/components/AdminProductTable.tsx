@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import React from "react";
+import { useRouter } from "next/navigation";
 import EditProductModal from "@/components/EditProductModal";
 
 interface Product {
@@ -22,6 +23,8 @@ interface Props {
 }
 
 export default function AdminProductTable({ products }: Props) {
+  const router = useRouter();
+
   const handleToggle = async (id: string, isHidden: boolean) => {
     const action = isHidden ? "show" : "hide";
     if (!confirm(`Are you sure you want to ${action} this product?`)) return;
@@ -29,10 +32,11 @@ export default function AdminProductTable({ products }: Props) {
     try {
       const res = await fetch(`/api/admin/products/${id}/toggle`, {
         method: "POST",
+        headers: { "Cache-Control": "no-cache" }, // prevent caching
       });
 
       if (res.ok) {
-        window.location.reload();
+        router.refresh(); // refresh server data
       } else {
         alert("Failed to update visibility");
       }
@@ -47,10 +51,11 @@ export default function AdminProductTable({ products }: Props) {
     try {
       const res = await fetch(`/api/admin/products/${id}`, {
         method: "DELETE",
+        headers: { "Cache-Control": "no-cache" },
       });
 
       if (res.ok) {
-        window.location.reload();
+        router.refresh();
       } else {
         alert("Failed to delete product");
       }
@@ -61,7 +66,7 @@ export default function AdminProductTable({ products }: Props) {
 
   return (
     <>
-      {/* Table – no modals inside */}
+      {/* Table */}
       <div className="overflow-x-auto">
         <table className="table table-zebra table-compact w-full">
           <thead>
@@ -139,7 +144,7 @@ export default function AdminProductTable({ products }: Props) {
         </table>
       </div>
 
-      {/* All Edit Modals – outside table, top-level */}
+      {/* Edit Modals – outside table */}
       {products.map((product) => (
         <EditProductModal key={product._id} product={product} />
       ))}

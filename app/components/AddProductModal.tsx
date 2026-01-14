@@ -1,9 +1,41 @@
 // app/components/AddProductModal.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
 import React from "react";
 
 export default function AddProductModal() {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+
+    const payload = {
+      name: formData.get("name"),
+      description: formData.get("description"),
+      price: Number(formData.get("price")),
+      unit: formData.get("unit"),
+      stock: Number(formData.get("stock")),
+      imageUrl: formData.get("imageUrl"),
+      category: formData.get("category"),
+    };
+
+    const res = await fetch("/api/admin/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      alert("Product added successfully!");
+      (document.getElementById("add-product-modal") as HTMLDialogElement)?.close();
+      router.refresh();  // ← refresh server data without full reload
+    } else {
+      alert("Failed to add product");
+    }
+  };
+
   return (
     <dialog id="add-product-modal" className="modal">
       <div className="modal-box max-w-3xl">
@@ -13,37 +45,7 @@ export default function AddProductModal() {
 
         <h3 className="font-bold text-2xl mb-6">Add New Product</h3>
 
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.currentTarget);
-
-            const payload = {
-              name: formData.get("name"),
-              description: formData.get("description"),
-              price: Number(formData.get("price")),
-              unit: formData.get("unit"),
-              stock: Number(formData.get("stock")),
-              imageUrl: formData.get("imageUrl"),
-              category: formData.get("category"),
-            };
-
-            const res = await fetch("/api/admin/products", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-
-            if (res.ok) {
-              alert("Product added successfully!");
-              (document.getElementById("add-product-modal") as HTMLDialogElement)?.close();
-              window.location.reload();
-            } else {
-              alert("Failed to add product");
-            }
-          }}
-          className="space-y-6"
-        >
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="label">

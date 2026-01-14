@@ -1,6 +1,7 @@
 // app/components/EditProductModal.tsx
 "use client";
 
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 type Product = {
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export default function EditProductModal({ product }: Props) {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: product.name || "",
     price: product.price || 0,
@@ -51,7 +53,7 @@ export default function EditProductModal({ product }: Props) {
       if (res.ok) {
         alert("Product updated successfully!");
         (document.getElementById(`edit-${product._id}`) as HTMLDialogElement)?.close();
-        window.location.reload();
+        router.refresh();
       } else {
         alert("Failed to update product");
       }

@@ -11,6 +11,10 @@ export async function POST(
     const params = await context.params;
     const id = params.id;
 
+    if (!id) {
+      return NextResponse.json({ error: "Product ID required" }, { status: 400 });
+    }
+
     await mongoose.connect(process.env.MONGODB_URI!);
 
     const product = await Product.findById(id);
@@ -21,9 +25,20 @@ export async function POST(
     product.hidden = !product.hidden;
     await product.save();
 
-    return NextResponse.json({ success: true, hidden: product.hidden });
+    // ← Add cache-control headers here
+    return NextResponse.json(
+      { success: true, hidden: product.hidden },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+        },
+      }
+    );
   } catch (error) {
-    console.error("Toggle error:", error);
-    return NextResponse.json({ error: "Failed to toggle" }, { status: 500 });
+    console.error("Toggle visibility error:", error);
+    return NextResponse.json({ error: "Failed to toggle visibility" }, { status: 500 });
   }
 }
