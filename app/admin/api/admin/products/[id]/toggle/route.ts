@@ -1,11 +1,16 @@
-// app/api/admin/products/[id]/toggle/route.ts
+// app/admin/api/admin/products/[id]/toggle/route.ts
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Product from "@/models/Product";
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  request: Request,
+  context: { params: { id: string } }
+) {
   try {
-    const { id } = params;
+    const { id } = context.params;
+
+    console.log("Toggle request for product ID:", id); // for debugging in Vercel logs
 
     if (!id) {
       return NextResponse.json({ error: "Product ID required" }, { status: 400 });
