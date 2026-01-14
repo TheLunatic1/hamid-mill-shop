@@ -3,8 +3,9 @@ import { Metadata } from "next";
 import AdminLayout from "./AdminLayout";
 import Product from "@/models/Product";
 import mongoose from "mongoose";
-import Link from "next/link";
-import Image from "next/image";
+import AdminProductTable from "@/components/AdminProductTable";
+import AddProductButton from "@/components/AddProductButton";
+import AddProductModal from "@/components/AddProductModal";
 
 export const metadata: Metadata = {
   title: "Admin Dashboard | Hamid Oil Flour and Dal Mill",
@@ -51,122 +52,53 @@ export default async function AdminDashboard() {
         <div className="container mx-auto p-8">
           <h1 className="text-4xl font-bold text-primary mb-8">Admin Dashboard</h1>
 
-          {/* Quick Action Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {/* Quick Stats */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
             <div className="card bg-base-100 shadow-xl">
               <div className="card-body">
-                <h2 className="card-title">Manage Products</h2>
-                <p>Add, edit, hide or delete products</p>
-                <div className="card-actions justify-end">
-                  <Link href="/admin/products/new" className="btn btn-primary">
-                    Add New Product
-                  </Link>
-                </div>
+                <h2 className="card-title">Total Products</h2>
+                <p className="text-4xl font-bold text-primary">{products.length}</p>
               </div>
             </div>
 
             <div className="card bg-base-100 shadow-xl opacity-50">
               <div className="card-body">
-                <h2 className="card-title">Orders</h2>
-                <p>View and manage customer orders</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-primary" disabled>
-                    Coming Soon
-                  </button>
-                </div>
+                <h2 className="card-title">Active Orders</h2>
+                <p className="text-4xl font-bold text-secondary">0</p>
+                <p className="text-sm opacity-70">Coming soon</p>
               </div>
             </div>
 
             <div className="card bg-base-100 shadow-xl opacity-50">
               <div className="card-body">
-                <h2 className="card-title">Users</h2>
-                <p>Manage customer accounts</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-primary" disabled>
-                    Coming Soon
-                  </button>
-                </div>
+                <h2 className="card-title">Revenue</h2>
+                <p className="text-4xl font-bold text-accent">৳0</p>
+                <p className="text-sm opacity-70">Coming soon</p>
               </div>
             </div>
           </div>
 
-          {/* Products Overview */}
-          <div className="card bg-base-100 shadow-xl">
+          {/* Product Management */}
+          <div className="card bg-base-100 shadow-2xl">
             <div className="card-body">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="card-title text-2xl">Products Overview</h2>
-                <Link href="/admin/products/new" className="btn btn-sm btn-primary">
-                  + Add New
-                </Link>
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <h2 className="card-title text-2xl">Product Management</h2>
+
+                <AddProductButton />
               </div>
 
               {products.length === 0 ? (
                 <div className="alert alert-info">
-                  <span>No products added yet. Click &quot;Add New&quot; to start.</span>
+                  <span>No products yet. Click &quot;Add New Product&quot; to start.</span>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="table table-zebra w-full">
-                    <thead>
-                      <tr>
-                        <th>Image</th>
-                        <th>Name</th>
-                        <th>Price</th>
-                        <th>Unit</th>
-                        <th>Stock</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((product) => (
-                        <tr key={product._id}>
-                          <td>
-                            {product.imageUrl ? (
-                              <div className="avatar">
-                                <div className="w-12 rounded">
-                                  <Image
-                                    src={product.imageUrl}
-                                    alt={product.name}
-                                    width={48}
-                                    height={48}
-                                    className="object-cover"
-                                  />
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="text-2xl">🌾</span>
-                            )}
-                          </td>
-                          <td>{product.name}</td>
-                          <td>৳{product.price}</td>
-                          <td>{product.unit}</td>
-                          <td>{product.stock}</td>
-                          <td>
-                            {product.hidden ? (
-                              <div className="badge badge-error">Hidden</div>
-                            ) : (
-                              <div className="badge badge-success">Visible</div>
-                            )}
-                          </td>
-                          <td>
-                            <div className="flex gap-2">
-                              <Link
-                                href={`/admin/products/${product._id}/edit`}
-                                className="btn btn-xs btn-info"
-                              >
-                                Edit
-                              </Link>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <AdminProductTable products={products} />
               )}
             </div>
           </div>
+
+          {/* Modal is now in client component */}
+          <AddProductModal />
         </div>
       </div>
     </AdminLayout>

@@ -9,9 +9,9 @@ type Product = {
   name: string;
   price: number;
   unit: string;
-  imageUrl?: string;
-  description?: string;
-  stock?: number;
+  description: string;
+  stock: number;
+  imageUrl: string;
 };
 
 type Props = {
@@ -33,14 +33,14 @@ export default function ProductModals({ products }: Props) {
               <div className="grid md:grid-cols-2 gap-8">
                 <figure>
                   <Image
-                    src={product.imageUrl || "/placeholder.jpg"}
+                    src={product.imageUrl}
                     alt={product.name}
                     width={500}
                     height={500}
-                    className="rounded-xl object-cover w-full h-full cursor-zoom-in hover:opacity-90 transition-opacity"
+                    className="rounded-xl object-cover w-full aspect-square cursor-zoom-in hover:opacity-90 transition-opacity"
                     onClick={() => {
-                      const enlarge = document.getElementById(`enlarge-${product._id}`) as HTMLDialogElement | null;
-                      if (enlarge) enlarge.showModal();
+                      const enlargeModal = document.getElementById(`enlarge-${product._id}`) as HTMLDialogElement;
+                      if (enlargeModal) enlargeModal.showModal();
                     }}
                   />
                 </figure>
@@ -55,13 +55,13 @@ export default function ProductModals({ products }: Props) {
 
                   <div>
                     <h4 className="font-semibold text-lg mb-2">Description</h4>
-                    <p className="text-base-content/80">{product.description || "No description available."}</p>
+                    <p className="text-base-content/80">{product.description}</p>
                   </div>
 
                   <div>
                     <h4 className="font-semibold text-lg mb-2">Stock</h4>
                     <p className="text-sm text-base-content/60">
-                      {product.stock || 0} units available
+                      {product.stock} units available
                     </p>
                   </div>
 
@@ -83,7 +83,7 @@ export default function ProductModals({ products }: Props) {
                         className="input input-bordered join-item w-20 text-center"
                         defaultValue={1}
                         min={1}
-                        max={product.stock || 999}
+                        max={product.stock}
                       />
                       <button className="btn join-item">+</button>
                     </div>
@@ -111,7 +111,7 @@ export default function ProductModals({ products }: Props) {
               </form>
 
               <Image
-                src={product.imageUrl || "/placeholder.jpg"}
+                src={product.imageUrl}
                 alt={`Enlarged view of ${product.name}`}
                 width={1600}
                 height={1600}
