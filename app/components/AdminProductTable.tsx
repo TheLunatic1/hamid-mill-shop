@@ -38,7 +38,7 @@ export default function AdminProductTable({ products }: Props) {
 
       if (res.ok) {
         router.refresh(); // refresh server data
-        router.replace(router.asPath, { scroll: false }); // refresh client components
+        
       } else {
         alert("Failed to update visibility");
       }
