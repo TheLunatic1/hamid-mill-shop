@@ -17,21 +17,20 @@ export default function Navbar() {
   // Theme state starts as null → prevents hydration mismatch
   const [theme, setTheme] = useState<"hamidlight" | "hamiddark" | null>(null);
 
-  // Apply saved theme on client mount (no setState here)
-  useEffect(() => {
-    // Skip server render
-    if (typeof window === "undefined") return;
+// Load and apply saved theme on client mount (only runs once)
+useEffect(() => {
+  // Skip on server
+  if (typeof window === "undefined") return;
 
-    const savedTheme = localStorage.getItem("theme") as "hamidlight" | "hamiddark" | null;
-    const appliedTheme = savedTheme || "hamidlight";
+  const savedTheme = localStorage.getItem("theme") as "hamidlight" | "hamiddark" | null;
+  const appliedTheme = savedTheme || "hamidlight";
 
-    // Apply to DOM immediately (safe in effect)
-    document.documentElement.setAttribute("data-theme", appliedTheme);
+  // Apply theme to DOM (safe synchronization)
+  document.documentElement.setAttribute("data-theme", appliedTheme);
 
-    // Update state only after DOM is updated
-    setTheme(appliedTheme);
-  }, []);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  setTheme(appliedTheme); // ← disable warning only here
+}, []);
   // Toggle theme (only called on user interaction → safe)
   const toggleTheme = () => {
     if (theme === null) return; // safety during initial mount
