@@ -3,15 +3,70 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { HiShoppingCart } from "react-icons/hi";
+import { HiShoppingCart, HiSun, HiMoon } from "react-icons/hi";
 import { AiOutlineMenu } from "react-icons/ai";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
   const { cartCount } = useCart();
   const logoUrl = "https://i.imgur.com/RRI2tEI.png";
+
+  // Theme state starts as null → prevents hydration mismatch
+  const [theme, setTheme] = useState<"hamidlight" | "hamiddark" | null>(null);
+
+  // Apply saved theme on client mount (no setState here)
+  useEffect(() => {
+    // Skip server render
+    if (typeof window === "undefined") return;
+
+    const savedTheme = localStorage.getItem("theme") as "hamidlight" | "hamiddark" | null;
+    const appliedTheme = savedTheme || "hamidlight";
+
+    // Apply to DOM immediately (safe in effect)
+    document.documentElement.setAttribute("data-theme", appliedTheme);
+
+    // Update state only after DOM is updated
+    setTheme(appliedTheme);
+  }, []);
+
+  // Toggle theme (only called on user interaction → safe)
+  const toggleTheme = () => {
+    if (theme === null) return; // safety during initial mount
+
+    const newTheme = theme === "hamidlight" ? "hamiddark" : "hamidlight";
+    setTheme(newTheme);
+    document.documentElement.setAttribute("data-theme", newTheme);
+    localStorage.setItem("theme", newTheme);
+  };
+
+  // Don't render interactive parts until theme is ready
+  if (theme === null) {
+    return (
+      <div className="navbar bg-base-100 shadow-md sticky top-0 z-50">
+        <div className="navbar-start">
+          <Link href="/" className="btn btn-ghost text-xl normal-case flex items-center gap-3">
+            <Image
+              src={logoUrl}
+              alt="Hamid Oil Flour and Dal Mill Logo"
+              width={48}
+              height={48}
+              className="object-contain"
+              priority
+            />
+            <div className="hidden sm:block">Hamid Oil Flour and Dal Mill</div>
+          </Link>
+        </div>
+        <div className="navbar-end gap-4">
+          {/* Skeleton for cart/auth */}
+          <div className="skeleton h-10 w-10 rounded-full"></div>
+          <div className="skeleton h-10 w-32 rounded-lg"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="navbar bg-base-100 shadow-md sticky top-0 z-50">
@@ -55,9 +110,18 @@ export default function Navbar() {
         </ul>
       </div>
 
-      {/* Right: Auth & Cart */}
-      <div className="navbar-end gap-4">
-        {/* Cart Icon with Badge */}
+      {/* Right: Theme + Cart + Auth */}
+      <div className="navbar-end gap-2 sm:gap-4">
+        {/* Theme Toggle */}
+        <button
+          className="btn btn-ghost btn-circle"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          {theme === "hamidlight" ? <HiMoon size={20} /> : <HiSun size={20} />}
+        </button>
+
+        {/* Cart Icon */}
         <div className="relative">
           <Link href="/cart" className="btn btn-ghost">
             <HiShoppingCart size={24} />
