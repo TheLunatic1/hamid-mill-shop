@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import React from "react";
+import { useCart } from "@/context/CartContext";
 
 type Product = {
   _id: string;
@@ -19,6 +20,42 @@ type Props = {
 };
 
 export default function ProductModals({ products }: Props) {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = (product: Product) => {
+    const quantityInput = document.getElementById(`quantity-${product._id}`) as HTMLInputElement | null;
+    if (!quantityInput) return;
+
+    const quantity = Number(quantityInput.value);
+    if (isNaN(quantity) || quantity < 1 || quantity > product.stock) {
+      alert(`Please enter a quantity between 1 and ${product.stock}`);
+      return;
+    }
+
+    addToCart({
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      unit: product.unit,
+      imageUrl: product.imageUrl,
+      quantity,
+    });
+
+    alert(`${quantity} × ${product.name} added to cart!`);
+    quantityInput.value = "1"; // reset
+    const modal = document.getElementById(`modal-${product._id}`) as HTMLDialogElement;
+    if (modal) modal.close();
+  };
+
+  const adjustQuantity = (productId: string, delta: number) => {
+    const input = document.getElementById(`quantity-${productId}`) as HTMLInputElement | null;
+    if (!input) return;
+
+    const current = Number(input.value) || 1;
+    const newValue = Math.max(1, Math.min(input.max ? Number(input.max) : 999, current + delta));
+    input.value = newValue.toString();
+  };
+
   return (
     <>
       {products.map((product) => (
@@ -75,20 +112,35 @@ export default function ProductModals({ products }: Props) {
                     </ul>
                   </div>
 
+                  {/* Cart Controls */}
                   <div className="modal-action flex flex-col sm:flex-row gap-4 w-full">
                     <div className="join w-full sm:w-auto">
-                      <button className="btn join-item">-</button>
+                      <button
+                        className="btn join-item"
+                        onClick={() => adjustQuantity(product._id, -1)}
+                      >
+                        -
+                      </button>
                       <input
                         type="number"
+                        id={`quantity-${product._id}`}
                         className="input input-bordered join-item w-20 text-center"
                         defaultValue={1}
                         min={1}
                         max={product.stock}
                       />
-                      <button className="btn join-item">+</button>
+                      <button
+                        className="btn join-item"
+                        onClick={() => adjustQuantity(product._id, 1)}
+                      >
+                        +
+                      </button>
                     </div>
 
-                    <button className="btn btn-primary flex-1">
+                    <button
+                      className="btn btn-primary flex-1"
+                      onClick={() => handleAddToCart(product)}
+                    >
                       Add to Cart
                     </button>
                   </div>

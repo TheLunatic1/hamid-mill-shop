@@ -6,9 +6,11 @@ import Image from "next/image";
 import { HiShoppingCart } from "react-icons/hi";
 import { AiOutlineMenu } from "react-icons/ai";
 import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const { user, loading, logout } = useAuth();
+  const { cartCount } = useCart();
   const logoUrl = "https://i.imgur.com/RRI2tEI.png";
 
   return (
@@ -39,32 +41,34 @@ export default function Navbar() {
             className="object-contain"
             priority
           />
-          <div className="hidden sm:block">
-            <span className="font-bold text-primary">Hamid</span>
-            <span className="text-secondary"> Mill</span>
-          </div>
+          <div className="hidden sm:block">Hamid Oil Flour and Dal Mill</div>
         </Link>
       </div>
 
       {/* Center: Desktop Menu */}
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
-          <li><Link href="/" className="text-lg font-medium">Home</Link></li>
-          <li><Link href="/products" className="text-lg font-medium">Products</Link></li>
-          <li><Link href="/about" className="text-lg font-medium">About</Link></li>
-          <li><Link href="/contact" className="text-lg font-medium">Contact</Link></li>
+          <li><Link href="/">Home</Link></li>
+          <li><Link href="/products">Products</Link></li>
+          <li><Link href="/about">About</Link></li>
+          <li><Link href="/contact">Contact</Link></li>
         </ul>
       </div>
 
-      {/* Right: Cart + Auth */}
+      {/* Right: Auth & Cart */}
       <div className="navbar-end gap-4">
-        {/* Cart Icon */}
-        <button className="btn btn-ghost btn-circle relative">
-          <HiShoppingCart size={28} />
-          <div className="badge badge-primary badge-sm absolute -top-1 -right-1">0</div>
-        </button>
+        {/* Cart Icon with Badge */}
+        <div className="relative">
+          <Link href="/cart" className="btn btn-ghost">
+            <HiShoppingCart size={24} />
+          </Link>
+          {cartCount > 0 && (
+            <span className="badge badge-primary badge-sm absolute -top-1 -right-1 animate-pulse">
+              {cartCount}
+            </span>
+          )}
+        </div>
 
-        {/* Auth Section */}
         {loading ? (
           <div className="skeleton h-10 w-32 rounded-lg"></div>
         ) : user ? (
@@ -76,19 +80,14 @@ export default function Navbar() {
               tabIndex={0}
               className="menu dropdown-content z-[1] p-2 shadow bg-base-100 rounded-box w-52 mt-2"
             >
-              {/* Admin Dashboard - only for admins */}
               {user.role === "admin" && (
                 <li>
                   <Link href="/admin">Admin Dashboard</Link>
                 </li>
               )}
-              
-              {/* My Account - for all logged-in users */}
               <li>
                 <Link href="/account">My Account</Link>
               </li>
-
-              {/* Logout */}
               <li>
                 <form action={logout}>
                   <button type="submit" className="w-full text-left">

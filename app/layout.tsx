@@ -1,14 +1,14 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import type { Viewport } from "next";  // ← Add this import
+import type { Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "./components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
-// Keep metadata as before (but without themeColor)
 export const metadata: Metadata = {
   title: {
     default: "Hamid Oil Flour and Dal Mill",
@@ -20,7 +20,6 @@ export const metadata: Metadata = {
   creator: "Hamid Oil Flour and Dal Mill",
   publisher: "Hamid Oil Flour and Dal Mill",
 
-  // Open Graph / Social Media
   openGraph: {
     title: "Hamid Oil Flour and Dal Mill",
     description: "Premium quality oil, flour, and dal products",
@@ -33,18 +32,11 @@ export const metadata: Metadata = {
         height: 675,
         alt: "Hamid Oil Flour and Dal Mill Logo - HOFDM",
       },
-      {
-        url: "https://i.imgur.com/RRI2tEI.png",
-        width: 800,
-        height: 800,
-        alt: "Hamid Oil Flour and Dal Mill Logo",
-      },
     ],
     locale: "en_US",
     type: "website",
   },
 
-  // Twitter Card
   twitter: {
     card: "summary_large_image",
     title: "Hamid Oil Flour and Dal Mill",
@@ -52,7 +44,6 @@ export const metadata: Metadata = {
     images: ["https://i.imgur.com/RRI2tEI.png"],
   },
 
-  // Favicon
   icons: {
     icon: "https://i.imgur.com/RRI2tEI.png",
     shortcut: "https://i.imgur.com/RRI2tEI.png",
@@ -60,7 +51,6 @@ export const metadata: Metadata = {
   },
 };
 
-// ← New viewport export with themeColor
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
@@ -77,8 +67,10 @@ export default function RootLayout({
     <html lang="en" data-theme="hamidlight">
       <body className={inter.className}>
         <AuthProvider>
-          <Navbar />
-          {children}
+          <CartProvider>
+            <Navbar />
+            {children}
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>
