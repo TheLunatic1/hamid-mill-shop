@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "Premium quality mustard oil, atta, dal, and grains directly from the mill",
 };
 
+export const revalidate = 0;
+
 async function getProducts() {
   try {
     await mongoose.connect(process.env.MONGODB_URI!);
@@ -26,15 +28,7 @@ async function getProducts() {
       description: doc.description,
       stock: doc.stock,
       imageUrl: doc.imageUrl,
-    })) as Array<{
-      _id: string;
-      name: string;
-      price: number;
-      unit: string;
-      description: string;
-      stock: number;
-      imageUrl: string;
-    }>;
+    }));
   } catch (error) {
     console.error("Products fetch error:", error);
     return [];
@@ -74,7 +68,6 @@ export default async function ProductsPage() {
           ))}
         </div>
 
-        {/* All modals handled in client component */}
         <ProductModals products={products} />
       </div>
     </div>
