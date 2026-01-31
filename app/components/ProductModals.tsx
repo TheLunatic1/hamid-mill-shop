@@ -1,4 +1,3 @@
-// app/components/ProductModals.tsx
 "use client";
 
 import Image from "next/image";
@@ -72,7 +71,7 @@ export default function ProductModals({ products }: Props) {
 
               <div className="flex flex-col sm:flex-row h-full">
                 {/* Left: Image – full height, covers perfectly */}
-                <div className="w-full sm:w-1/2 h-64 sm:h-auto relative overflow-hidden">
+                <div className="w-full sm:w-1/2 h-full sm:h-auto relative overflow-hidden">
                   <Image
                     src={product.imageUrl}
                     alt={product.name}

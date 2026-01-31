@@ -1,4 +1,3 @@
-// app/components/ProductCard.tsx
 "use client";
 
 import Image from "next/image";
@@ -9,7 +8,6 @@ type Product = {
   price: number;
   unit: string;
   imageUrl?: string;
-  // add more fields if you need them later
 };
 
 type Props = {

@@ -1,4 +1,3 @@
-// app/components/AuthRedirect.tsx
 "use client";
 
 import { useAuth } from "@/context/AuthContext";

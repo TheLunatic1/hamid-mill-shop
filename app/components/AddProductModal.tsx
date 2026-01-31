@@ -1,4 +1,3 @@
-// app/components/AddProductModal.tsx
 "use client";
 
 import { useRouter } from "next/navigation";
