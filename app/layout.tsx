@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import Footer from "./components/Footer";
+import CustomCursor from "./components/CustomCursor";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -66,6 +67,7 @@ export default function RootLayout({
   return (
     <html lang="en" data-theme="hamidlight">
       <body className={inter.className}>
+        <CustomCursor />
         <AuthProvider>
           <CartProvider>
             <Navbar />

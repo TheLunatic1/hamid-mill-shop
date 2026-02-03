@@ -71,3 +71,33 @@
   --radius-btn: 0.5rem;
   --radius-card: 1rem;
 }
+
+
+
+
+
+/* Force hide default cursor everywhere */
+html, body, *, *:hover, *:focus, *:active, *:focus-visible {
+  cursor: none !important;
+}
+
+/* Optional hover visual feedback */
+.hover-magnet,
+button,
+a,
+.card,
+.btn,
+.link {
+  transition: all 0.25s ease;
+}
+
+.hover-magnet:hover,
+button:hover,
+a:hover,
+.card:hover,
+.btn:hover,
+.link:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.08);
+}
