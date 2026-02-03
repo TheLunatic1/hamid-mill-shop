@@ -66,7 +66,7 @@ export default function CustomCursor() {
     const syncCursorToModal = () => {
       const openModal = document.querySelector("dialog[open]");
       if (openModal && openModal !== currentModal) {
-        currentModal = openModal;
+        currentModal = openModal as HTMLElement;
         openModal.appendChild(cursor);
         openModal.appendChild(ring);
         cursor.style.zIndex = "9999999";
