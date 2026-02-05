@@ -36,7 +36,7 @@ export default function ClientFilters({ initialProducts }: Props) {
 
     // Sort
     result.sort((a, b) => {
-      if (sort === "newest") return 0; // server already sorted newest
+      if (sort === "newest") return 0;
       if (sort === "price-low") return a.price - b.price;
       if (sort === "price-high") return b.price - a.price;
       if (sort === "name-asc") return a.name.localeCompare(b.name);
@@ -89,7 +89,7 @@ export default function ClientFilters({ initialProducts }: Props) {
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Grid – Daraz-style responsive layout */}
       {filteredProducts.length === 0 ? (
         <div className="alert alert-info shadow-lg max-w-2xl mx-auto mt-8">
           <svg
@@ -108,7 +108,7 @@ export default function ClientFilters({ initialProducts }: Props) {
           <span>No products found. Try different search terms or category.</span>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-6 mt-8">
           {filteredProducts.map((product) => (
             <ProductCard key={product._id} product={product} />
           ))}
